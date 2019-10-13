@@ -30,3 +30,17 @@ app.engine("handlebars", exphbs({
 }));
 app.set("view engine", "handlebars");
 
+// Getting mongoose to connect to newsflash db
+mongoose.connect("mongodb://localhost/newsflash");
+
+
+// Routes
+app.get("/", function (req, res) {
+   article.find({ "saved": false }, function (error, data) {
+      var hbsObject = {
+         article: data
+      };
+      console.log(hbsObject);
+      res.render("home", hbsObject);
+   });
+});
