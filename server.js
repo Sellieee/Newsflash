@@ -38,7 +38,7 @@ app.set("view engine", "handlebars");
 mongoose.connect("mongodb://localhost/newsflash", { useNewUrlParser: true });
 
 
-// Routes
+// Routes to show main page
 app.get("/", function (req, res) {
    Article.find({ "saved": false }, function (error, data) {
       var hbsObject = {
@@ -49,6 +49,7 @@ app.get("/", function (req, res) {
    });
 });
 
+// Routes to show saved articles
 app.get("/saved", function (req, res) {
    Article.find({ "saved": true }, function (error, data) {
       var hbsObject = {
@@ -58,6 +59,7 @@ app.get("/saved", function (req, res) {
    });
 });
 
+// Route to scrape articles from The Age
 app.get("/scrape", function (req, res) {
    axios.get("https://www.theage.com.au/technology").then(function (response) {
       var $ = cheerio.load(response.data);
@@ -80,6 +82,7 @@ app.get("/scrape", function (req, res) {
    });
 });
 
+// Route to clear unsaved
 app.get("/clear", function (req, res) {
    db.Article.remove({ "saved": false }, function (error, removed) {
       if (error) {
@@ -101,4 +104,44 @@ app.get("/articles", function (req, res) {
          res.json(data);
       }
    });
+});
+
+// Routes for an article
+app.get("/articles/:id", function (req, res) {
+   Article.findOne({ "_id": req.params.id })
+      .populate("note")
+      .then(function (error, data) {
+         if (error) {
+            console.log(error);
+         }
+         else {
+            res.json(data);
+         }
+      });
+});
+
+// Routes to save the article
+app.post("/articles/save/:id", function (req, res) {
+   Article.findOneAndUpdate({ "_id": req.params.id }, { "saved": true })
+      .then(function (error, data) {
+         if (error) {
+            console.log(error)
+         }
+         else {
+            res.send(data);
+         }
+      });
+});
+
+// Route to delete the article
+app.post("/articles/delete/:id", function (req, res) {
+   Article.findOneAndUpdate({ "_id": req.params.id }, { "saved": false, "notes": [] })
+      .then(function (error, data) {
+         if (error) {
+            console.log(error)
+         }
+         else {
+            res.send(data);
+         }
+      });
 });
