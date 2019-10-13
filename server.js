@@ -57,3 +57,25 @@ app.get("/saved", function (req, res) {
       res.render("saved", hbsObject);
    });
 });
+
+app.get("/scrape", function (req, res) {
+   axios.get("https://www.theage.com.au/technology").then(function (response) {
+      var $ = cheerio.load(response.data);
+      $(".X3yYQ").each(function (i, element) {
+         var result = {};
+
+         // Scraping the title, link and summary
+         result.title = $(element).find("h3").text();
+         result.link = $(element).find("a").attr("href");
+         result.summary = $(element).find("p").text();
+
+         Article.create(result).then(function (data) {
+            console.log(data);
+         })
+            .catch(function (error) {
+               return res.json(error)
+            });
+      });
+      res.send("Scrape Complete");
+   });
+});
