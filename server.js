@@ -1,26 +1,32 @@
-// Requiring express
+// Dependencies
 var express = require("express");
-
-// Requiring body-parser
 var bodyParser = require("body-parser");
-
-// Requiring mongoose
 var mongoose = require("mongoose");
-
 // Requiring morgan Middleware to help generate server logs
 var morgan = require("morgan");
-
-// Require path
 var path = require("path");
 
-// Using note.js
+// Models
 var note = require("./models/note.js");
-
-// Using article.js
 var note = require("./models/article.js");
 
-// Requiring requests
-var request = require("request");
-
-// Requiring Cheerio
+// Scraping tools
+var request = require("axios");
 var cheerio = require("cheerio");
+
+// PORT
+var PORT = process.env.PORT || 8080;
+
+// Express
+var app = express();
+
+app.use(express.static("public"));
+
+// Handlebars
+var exphbs = require("express-handlebars");
+app.engine("handlebars", exphbs({
+   defaultLayout: "main",
+   partialsDir: path.join(__dirname, "/views/layouts/partials")
+}));
+app.set("view engine", "handlebars");
+
