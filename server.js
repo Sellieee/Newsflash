@@ -79,3 +79,26 @@ app.get("/scrape", function (req, res) {
       res.send("Scrape Complete");
    });
 });
+
+app.get("/clear", function (req, res) {
+   db.Article.remove({ "saved": false }, function (error, removed) {
+      if (error) {
+         console.log(error);
+      }
+      else {
+         console.log("Article removed.");
+      }
+   });
+   res.redirect("/");
+});
+
+app.get("/articles", function (req, res) {
+   Article.find({}, function (error, data) {
+      if (error) {
+         console.log(error);
+      }
+      else {
+         res.json(data);
+      }
+   });
+});
