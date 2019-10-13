@@ -145,3 +145,55 @@ app.post("/articles/delete/:id", function (req, res) {
          }
       });
 });
+
+// Routes to comment
+app.post("/notes/save/:id", function (req, res) {
+   var newNote = new Note({
+      body: req.body.text,
+      article: req.params.id
+   });
+   console.log(req.body);
+   newNote.save(function (error, note) {
+      if (error) {
+         console.log(error)
+      }
+      else {
+         Article.findOneAndUpdate({ "_id": req.params.id }, { $push: { "notes": note } })
+            .then(function (error) {
+               if (error) {
+                  console.log(error);
+                  res.send(error);
+               }
+               else {
+                  res.send(note);
+               }
+            });
+      };
+   });
+});
+
+// Route to delete a note
+app.delete("/notes/delete/:note_id/:article_id", function (req, res) {
+   Note.findOneAndRemove({ "_id": req.params.id }, function (error) {
+      if (error) {
+         console.log(error);
+         res.send(error);
+      }
+      else {
+         Article.findOneAndUpdate({ "_id": req.params.id }, { $pull: { "notes": req.params.note_id } })
+            .then(function (error) {
+               if (error) {
+                  console.log(error);
+                  res.send(error);
+               }
+               else {
+                  res.send("Selected note has been deleted.");
+               }
+            });
+      };
+   });
+});
+
+app.listen(PORT, function () {
+   console.log("App runninng on port " + PORT);
+});
