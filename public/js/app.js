@@ -50,3 +50,28 @@ $(".save-note").on("click", function () {
    });
 });
 
+// Deleting the note
+$(".delete-note").on("click", function () {
+   var noteId = $(this).attr("data-note-id");
+   var articleId = $(this).attr("data-article-id");
+   $.ajax({
+      method: "DELETE",
+      url: "/notes/delete/" + noteId + "/" + articleId
+   }).done(function (data, res) {
+      console.log(data);
+      $(".modalNote").modal("hide");
+      res.redirect("/saved");
+   });
+});
+
+// Delete button
+$("#delete-button").on("click", function () {
+   $.ajax({
+      method: "GET",
+      url: "/clear"
+   }).done(function (data, res) {
+      console.log("Articles cleared!");
+      res.redirect("/");
+   });
+});
+
